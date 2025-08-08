@@ -46,3 +46,8 @@ apps:
         name: temporal-schema-*
         jsonPointers:
           - /status
+      - group: ""
+        kind: Secret
+        name: temporal-grafana
+        jsonPointers:
+          - /data/admin-password
