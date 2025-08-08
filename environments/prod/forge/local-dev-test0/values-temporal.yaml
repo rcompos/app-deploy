@@ -43,7 +43,7 @@
 #   enabled: true
 
 elasticsearch:
-  enabled: false
+  replicas: 1
 
 # schema:
 #   createDatabase:
