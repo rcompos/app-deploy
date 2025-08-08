@@ -31,31 +31,31 @@
 #           maxConns: 20
 #           maxConnLifetime: "1h"
 
-cassandra:
-  enabled: false
-  persistence:
-    enabled: false
+# cassandra:
+#   enabled: false
+#   persistence:
+#     enabled: false
 
-mysql:
-  enabled: false
+# mysql:
+#   enabled: false
 
-postgresql:
-  enabled: true
+# postgresql:
+#   enabled: true
 
-elasticsearch:
-  enabled: false
+# elasticsearch:
+#   enabled: false
 
-schema:
-  createDatabase:
-    enabled: true
-  setup:
-    enabled: true
-  update:
-    enabled: true
+# schema:
+#   createDatabase:
+#     enabled: true
+#   setup:
+#     enabled: true
+#   update:
+#     enabled: true
 
-prometheus:
-  enabled: false
-  nodeExporter:
-    enabled: false
-grafana:
-  enabled: false
+# prometheus:
+#   enabled: false
+#   nodeExporter:
+#     enabled: false
+# grafana:
+#   enabled: false
