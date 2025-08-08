@@ -24,10 +24,10 @@ apps:
   - name: temporal
     chartDir: temporal
     chartVer: v1
-    # ignoreDifferences:
-    #   - group: batch
-    #     kind: Job
-    #     name: temporal-schema-*
-    #     jsonPointers:
-    #       - /status
-    #       - /spec/template/spec/initContainers
+    ignoreDifferences:
+      - group: batch
+        kind: Job
+        name: temporal-schema-*
+        jsonPointers:
+          - /status
+          - /spec/template/spec/initContainers
