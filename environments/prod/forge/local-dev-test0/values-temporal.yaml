@@ -42,8 +42,8 @@
 # postgresql:
 #   enabled: true
 
-# elasticsearch:
-#   enabled: false
+elasticsearch:
+  enabled: false
 
 # schema:
 #   createDatabase:
