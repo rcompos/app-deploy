@@ -51,3 +51,9 @@ apps:
         name: temporal-grafana
         jsonPointers:
           - /data/admin-password
+      - group: ""
+        kind: Deployment
+        name: temporal-grafana
+        jsonPointers:
+          - /spec/template/metadata/annotations/checksum/secret
+
