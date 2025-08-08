@@ -18,6 +18,8 @@ spec:
     # automated: {}
     syncOptions:
       - CreateNamespace=true
+      - RespectIgnoreDifferences=true
+      - ApplyOutOfSyncOnly=true
 
 ### Applications to deploy, including overrides
 apps:
@@ -25,9 +27,16 @@ apps:
     chartDir: temporal
     chartVer: v1
     ignoreDifferences:
+      - group: apiextensions.k8s.io
+        jsonPointers:
+          - metadata/labels
       - group: batch
         kind: Job
         name: temporal-schema-*
         jsonPointers:
           - /status
           - /spec/template/spec/initContainers
+          - /metadata/annotations
+          - /spec/completions
+          - /spec/parallelism
+          - /spec/activeDeadlineSeconds
