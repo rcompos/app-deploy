@@ -1,0 +1,59 @@
+### Global values apply to all child ArgoCD Applications
+spec:
+  name: aoa-nke-site
+  env: ${ENV_NAME}
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namePrefix: ""
+  source:
+    repoURL: ${REPO_URL}
+    targetRevision: ${TARGET_REVISION}
+  # ### Add this finalizer ONLY if you want child apps to cascade delete.
+  # finalizers:
+  #   - resources-finalizer.argocd.argoproj.io
+  ignoreDifferencesMetadataLabels: true
+  envPath: ${PROD_TYPE}/${CSP}
+  syncPolicy:
+    automated: {}
+    syncOptions:
+      - CreateNamespace=true
+
+### Applications to deploy, including overrides
+apps:
+  - name: cnpg-temporal
+    repoURL: https://helm.ngc.nvidia.com/j7sbcjl3qgta  # NGC NKE
+    targetRevision: "0.2.0"
+    chart: cnpg-cluster
+  - name: cnpg-site
+    repoURL: https://helm.ngc.nvidia.com/j7sbcjl3qgta  # NGC NKE
+    targetRevision: "0.2.0"
+    chart: cnpg-cluster
+  - name: cnpg-cloud
+    repoURL: https://helm.ngc.nvidia.com/j7sbcjl3qgta  # NGC NKE
+    targetRevision: "0.2.0"
+    chart: cnpg-cluster
+  - name: temporal
+    repoURL: https://helm.ngc.nvidia.com/j7sbcjl3qgta  # NGC NKE
+    targetRevision: "0.54.0"
+    chart: temporal
+    ignoreDifferences:
+      - group: batch
+        kind: Job
+        name: temporal-schema-*
+        jsonPointers:
+          - /status
+          - /spec/template/spec/initContainers
+  - name: site-workflow-engine
+    repoURL: https://helm.ngc.nvidia.com/j7sbcjl3qgta  # NGC NKE
+    targetRevision: "0.2.0"
+    chart: site-workflow-engine
+  - name: forge-workflow-engine
+    repoURL: https://helm.ngc.nvidia.com/j7sbcjl3qgta  # NGC NKE
+    targetRevision: "2.0.0"
+    chart: forge-workflow-engine
+  - name: cloud-workflow-engine
+    repoURL: https://gitlab.com/nvidia/nvcloud/gitlab_nke-cloud-deploy.git
+    targetRevision: main
+    chartDir: cloud-workflow-engine
+    chartVer: "2.0.0"

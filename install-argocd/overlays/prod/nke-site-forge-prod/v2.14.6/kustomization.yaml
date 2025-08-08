@@ -1,0 +1,12 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../../../base/v2.14.6
+### Need to create image pull secret
+# images:
+#   - name: quay.io/argoproj/argocd
+#     newName: nvcr.io/j7sbcjl3qgta/argocd
+#     newTag: v2.13.0
+# patches:
+#   - path: overrides.yaml
+patches: []

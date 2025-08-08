@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+set -x
+
+CLUSTER_NAME=$1
+CONFIG_TEMPLATE=$2
+
+if [ -z "$CLUSTER_NAME" ]; then
+  echo "Must specify cluster name as first argument"
+  exit 1
+fi
+
+if [ -z "$CONFIG_TEMPLATE" ]; then
+  echo "Must specify config template as second argument"
+  exit 2
+fi
+
+CLUSTER_DIR="cluster-${CLUSTER_NAME}"
+CLUSTER_CONFIG="${CLUSTER_DIR}/kind-config.yaml"
+
+echo mkdir -m755 "$CLUSTER_DIR"
+mkdir -m755 "$CLUSTER_DIR"
+
+# Copy and transform Kind config file to this dir
+cat "${CONFIG_TEMPLATE}" | envsubst '$CLUSTER_NAME' > "$CLUSTER_CONFIG"
+
+kind create cluster --name "$CLUSTER_NAME" --config "$CLUSTER_CONFIG" --kubeconfig "cluster-${CLUSTER_NAME}/${CLUSTER_NAME}.kubeconfig"

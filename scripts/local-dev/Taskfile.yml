@@ -1,0 +1,110 @@
+# https://taskfile.dev
+
+version: '3'
+
+vars:
+  GREETING: NKE Local Development
+  # LOCAL_DEV_CONFIG_PATH: env/macos/config.yaml
+
+env:
+  VERSION:
+    sh: cat .version
+  # CLUSTER_NAME is set in .env
+  # BRANCH:
+  #   sh: git rev-parse --abbrev-ref HEAD
+  # # CONFIG: '{{.LOCAL_DEV_CONFIG_PATH}}'
+  CONFIG_TEMPLATE: kind-config-template.yaml
+  REPO_NAME: nke-site-deploy
+  REPO_URL: https://gitlab-master.nvidia.com/nke/{{.REPO_NAME}}.git
+  # ARGOCD_REPO_CREDS: ~/argocd-repo-creds.yml
+  # CNPG_BOOTSTRAP_SECRETS: ~/cnpg-bootstrap-secrets.yaml
+
+# dotenv: ['.env', 'cluster-{{.CLUSTER_NAME}}/.env']
+dotenv: ['.env']
+
+tasks:
+  default:
+    cmds:
+      - echo "{{.GREETING}}"
+      - 'echo version:  {{.VERSION}}'
+      # - 'echo "branch:    $BRANCH"'
+      # - 'echo  config:   {{.CONFIG}}'
+      - 'echo "CLUSTER_NAME: {{.CLUSTER_NAME}}"'
+      - 'echo "CONFIG_TEMPLATE: {{.CONFIG_TEMPLATE}}"'
+      - 'echo "REPO_NAME: {{.REPO_NAME}}"'
+      - 'echo "REPO_URL: {{.REPO_URL}}"'
+      - 'echo "ARGOCD_REPO_CREDS: {{.ARGOCD_REPO_CREDS}}"'
+      - 'echo "CNPG_BOOTSTRAP_SECRETS: {{.CNPG_BOOTSTRAP_SECRETS}}"'
+      - 'echo "NGC_NKE_SVC_TOKEN_FILE: {{.NGC_NKE_SVC_TOKEN_FILE}}"'
+    silent: true
+
+  kubeconfig:
+    desc: Show command to export KUBECONFIG envvar
+    cmds:
+      # From terminal, run to set KUBECONFIG:  eval $(task env)
+      - echo "export KUBECONFIG=$PWD/cluster-{{.CLUSTER_NAME}}/{{.CLUSTER_NAME}}.kubeconfig"
+    silent: true
+
+  setup-darwin:
+    desc: Setup dependencies on Darwin
+    platforms: [darwin]
+    cmds:
+      - tools/setup-darwin
+
+  setup-linux:
+    desc: Setup dependencies on Linux
+    platforms: [linux]
+    cmds:
+      - tools/setup-linux
+
+  create-cluster:
+    desc: Create local kind cluster
+    cmds:
+      - echo "Create kind cluster for local development"
+      - tools/create-kind-cluster {{.CLUSTER_NAME}} {{.CONFIG_TEMPLATE}} {{.REPO_NAME}} {{.REPO_URL}}
+
+  list-cluster:
+    desc: List kind clusters
+    cmds:
+      - kind get clusters | grep "^{{.CLUSTER_NAME}}$"
+    silent: true
+
+  show-kind-configuration:
+    desc: Show kind cluster configuration
+    cmds:
+      - kind get clusters | grep "^{{.CLUSTER_NAME}}$"
+      - cat {{.CONFIG_TEMPLATE}} | envsubst '$CLUSTER_NAME'
+    silent: true
+  
+  create-secrets:
+    desc: Create secrets
+    cmds:
+      - echo "Create secrets"
+      - tools/create-secrets {{.CLUSTER_NAME}} {{.REPO_NAME}} {{.REPO_URL}} {{.ARGOCD_REPO_CREDS}} {{.CNPG_BOOTSTRAP_SECRETS}} {{.NGC_NKE_SVC_TOKEN_FILE}}
+    silent: true
+
+  install-argocd:
+    desc: Install ArgoCD
+    cmds:
+      - echo "Install ArgoCD"
+      - tools/install-argocd {{.CLUSTER_NAME}} {{.REPO_NAME}} {{.REPO_URL}}
+    silent: true
+
+  deploy-apps:
+    desc: Deploy apps
+    cmds:
+      - echo "Deploy ArgoCD apps"
+      - tools/deploy-apps {{.CLUSTER_NAME}} {{.REPO_NAME}} {{.REPO_URL}} {{.DEPLOY_ENV}}
+
+  # sync:
+  #   desc: Sync apps
+  #   cmds:
+  #     - echo "Deploy ArgoCD apps"
+  #     - tools/sync-apps {{.CLUSTER_NAME}} {{.REPO_NAME}} {{.REPO_URL}} {{.DEPLOY_ENV}}
+
+  delete-cluster:
+    desc: Delete local kind cluster
+    prompt: Delete kind cluster {{.CLUSTER_NAME}}... Continue?
+    cmds:
+      - kind delete cluster --name {{.CLUSTER_NAME}}
+      - echo "Checking clusters..."; kind get clusters

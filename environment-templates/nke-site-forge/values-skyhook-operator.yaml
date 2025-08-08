@@ -1,0 +1,13 @@
+controllerManager:
+  manager:
+    image:
+      repository: nvcr.io/nv-ngc-devops/skyhook-operator
+      tag: v0.6.0
+    resources:
+      limits:
+        cpu: 500m
+        memory: 1Gi
+      requests:
+        cpu: 500m
+        memory: 128Mi
+imagePullSecret: nvidia-ngcuser-pull-secret

@@ -1,0 +1,20 @@
+nameOverride: cnpg-temporal
+
+type: postgresql
+mode: standalone
+
+cluster:
+  instances: 3
+  superuserSecret: superuser-secret
+  storage:
+    size: 100Gi
+    storageClass: local-storage-cnpg-temporal
+  affinity:
+    topologyKey: kubernetes.io/hostname  # Used in place of 'zone' since we are single AZ
+  initdb:
+    database: temporal
+    owner: temporal
+    secret:
+      name: cnpg-temporal-bootstrap-secret  # Secret with username and password
+  monitoring:
+    enabled: true

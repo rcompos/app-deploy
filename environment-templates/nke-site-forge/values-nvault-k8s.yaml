@@ -1,0 +1,19 @@
+## nvault helm chart repo - https://gitlab-master.nvidia.com/nvault/k8s/nvault-k8s-helm/
+fullnameOverride:  "nvault-k8s"
+global:
+  imagePullSecrets:
+    - name: ngc-registry-nke-imagepull
+
+injector:
+  # image sets the repo and tag of the vault-k8s image to use for the injector.
+  image:
+    repository: nvcr.io/j7sbcjl3qgta
+    name: nvcr_io__nvidian__nvault-k8s
+    tag: "1.0.4"
+  # agentImage sets the repo and tag of the Vault image to use for the Vault Agent
+  # containers.  This should be set to the official Vault image.  Vault 2.3.0+ is
+  # required.
+  agentImage:
+    repository: nvcr.io/j7sbcjl3qgta
+    name: nvcr_io__nvidian__nvault-agent
+    tag: "2.4-openssl-multi"

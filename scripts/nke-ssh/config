@@ -1,0 +1,171 @@
+Host *
+  IdentityFile ~/.ssh/id_ed25519
+
+# Jump Boxes
+Host wus-jb-admin01
+    Hostname 10.45.32.84
+
+Host sdc-jb-admin01
+    Hostname 10.45.33.84
+
+Host cnc-jb-admin01
+    Hostname 10.91.241.84
+
+Host uswest1
+    Hostname 10.45.32.85
+
+Host uswest2
+    Hostname 10.45.52.84
+
+Host gwc-jb-admin01
+  Hostname 10.91.245.84
+
+Host jpn-jb-admin01
+  Hostname 10.91.243.84
+  ProxyJump none
+
+# Staging Servers
+Host sdc-mc-staging
+    Hostname 10.45.33.106
+    ProxyJump sdc-jb-admin01
+
+Host wus-mc-staging
+    Hostname 10.45.32.108
+    ProxyJump wus-jb-admin01
+
+Host cnc-mc-staging
+    hostname 10.91.241.102
+    ProxyJump cnc-jb-admin01
+
+Host jpn-mc-staging
+  Hostname 10.91.243.102
+  ProxyJump jpn-jb-admin01
+
+# Azure Colo Hosts
+Host az01
+    Hostname wus-mc-staging
+    ProxyJump wus-jb-admin01
+
+Host az02
+    Hostname wus-mc-staging
+    ProxyJump wus-jb-admin01
+
+Host az03
+    Hostname 10.45.58.3
+    ProxyJump uswest2
+
+Host az05
+    Hostname 10.45.90.3
+    ProxyJump uswest1
+
+Host az06
+    Hostname wus2-mc-staging
+    ProxyJump wus2-jb-admin01
+
+Host az22
+    Hostname sdc-mc-staging
+    ProxyJump sdc-jb-admin01
+
+Host az23
+  Hostname sdc-mc-staging
+  ProxyJump sdc-jb-admin01
+
+Host az24
+    Hostname sdc-mc-staging
+    ProxyJump sdc-jb-admin01
+
+Host az27
+    Hostname sdc-mc-staging
+    ProxyJump sdc-jb-admin01
+
+Host az33
+  Hostname sdc-mc-staging
+  ProxyJump sdc-jb-admin01	
+
+Host az40
+    Hostname cnc-mc-staging
+    ProxyJump cnc-jb-admin01
+
+Host az50
+  Hostname jpn-mc-staging
+  ProxyJump jpn-jb-admin01
+
+Host az60
+  Hostname gwc-mc-staging
+  ProxyJump gwc-jb-admin01
+
+# Site Controller Hosts
+Host az01sc
+    Hostname 10.45.0.2
+    ProxyJump az01
+    User nke
+
+Host az02sc
+    Hostname 10.45.40.10
+    ProxyJump az02
+    User nke
+
+Host az05sc
+    Hostname 10.45.88.133
+    ProxyJump az05
+    User nke
+
+Host az06sc
+  Hostname 10.45.104.3
+  ProxyJump az06
+  User nke
+
+Host az22sc
+  Hostname 10.45.112.2
+  ProxyJump az22
+  User nke
+
+Host az23sc
+  Hostname 10.45.136.2
+  ProxyJump az23
+  User dgxc-admin
+
+Host az24sc
+    Hostname 10.45.144.170
+    ProxyJump az24
+    User nke
+
+Host az24cnisc
+    Hostname 10.45.144.26
+    ProxyJump az24
+    User dgxc-admin
+
+Host az27sc
+    Hostname 10.45.184.147
+    ProxyJump az27
+    User nke
+
+Host az40sc
+    Hostname 10.91.130.2
+    ProxyJump az40
+    User nke
+
+Host az33sc
+  Hostname 10.45.224.133
+  ProxyJump az33
+  User dgxc-admin
+
+# Host az22sc
+#     Hostname 10.45.184.147
+#     ProxyJump az22
+#     User nke
+
+Host az50sc
+  Hostname 10.91.146.2
+  ProxyJump az50
+  User dgxc-admin
+
+Host az60sc
+  Hostname 10.91.162.2
+  ProxyJump az60
+  User dgxc-admin
+
+Host az24-baseos-sc
+  Hostname 10.45.144.202
+  ProxyJump az24
+  User nke

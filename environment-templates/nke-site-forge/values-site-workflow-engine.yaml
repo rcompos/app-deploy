@@ -1,0 +1,6 @@
+app:
+  image: nvcr.io/j7sbcjl3qgta/site-workflow-engine:v0.0.212
+  imagePullSecret: ngc-registry-nke-imagepull
+appDb:
+  url: cnpg-site-rw.cnpg-site.svc.cluster.local:5432
+  postgresPassword: postgres

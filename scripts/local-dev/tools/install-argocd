@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+set -x
+
+CLUSTER_NAME=$1
+REPO_NAME=$2
+REPO_URL=$3
+
+CLUSTER_DIR="cluster-${CLUSTER_NAME}"
+cd "$CLUSTER_DIR"
+
+export KUBECONFIG="${PWD}/${CLUSTER_NAME}.kubeconfig"
+
+if [ -d "$REPO_NAME" ]; then
+  echo "Directory exists"
+  cd "$REPO_NAME"
+  git pull
+  cd ..
+else
+  git clone "${REPO_URL}"
+fi
+
+# Install ArgoCD
+cd "${REPO_NAME}/install-argocd"
+kubectl create ns argocd
+kustomize build overlays/prod/nke-site-forge-prod/latest | kubectl -n argocd apply -f -
+cd ..
+
+echo -n "Checking if argocd service is running"
+set +x
+for i in {0..30}; do
+  available_replicas=`kubectl -n argocd get deployment argocd-server -ojson | jq ".status.availableReplicas"`
+  # echo "available_replicas: $available_replicas"
+  if [ "$available_replicas" != "null" ]; then
+    break
+  fi
+  echo -n .
+  sleep 5
+done
+echo
+set -x
+sleep 15 
+
+# Login to ArgoCD
+ARGOCD_PW=`argocd admin initial-password -n argocd | head -1`; echo $ARGOCD_PW

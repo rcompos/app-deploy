@@ -1,0 +1,26 @@
+image:
+  repository: nvcr.io/j7sbcjl3qgta/cloud-workflow-engine
+  tag: v0.0.190
+
+imagePullSecrets:
+  - name: ngc-registry-nke-imagepull
+
+temporal:
+  cloudDb:
+    host: cnpg-cloud-rw.cnpg-cloud.svc.cluster.local
+    args: sslmode=disable
+
+appDb:
+  url: cnpg-cloud-rw.cnpg-cloud.svc.cluster.local
+  dbName: cloud-workflow
+  postgresUser: postgres
+  postgresPassword: postgres
+
+podSecurityContext:
+  runAsNonRoot: false
+
+livenessProbe: null
+readinessProbe: null
+
+profiles:
+  path: "./profiles"

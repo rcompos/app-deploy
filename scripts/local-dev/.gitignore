@@ -1,0 +1,3 @@
+cluster-*
+argo-repo-creds.yaml
+cnpg-bootstrap-secrets.yaml

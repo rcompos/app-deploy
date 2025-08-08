@@ -1,0 +1,17 @@
+# kind cluster config
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+- role: control-plane
+- role: worker
+  extraMounts:
+  - hostPath: /mnt/shared/${CLUSTER_NAME}-1
+    containerPath: /mnt/shared
+- role: worker
+  extraMounts:
+  - hostPath: /mnt/shared/${CLUSTER_NAME}-2
+    containerPath: /mnt/shared
+- role: worker
+  extraMounts:
+  - hostPath: /mnt/shared/${CLUSTER_NAME}-3
+    containerPath: /mnt/shared

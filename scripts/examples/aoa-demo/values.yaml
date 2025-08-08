@@ -1,0 +1,85 @@
+### Global values apply to all child ArgoCD Applications
+spec:
+  name: aoa-demo
+  env: nke-site-forge-az00
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namePrefix: ""
+  source:
+    repoURL: https://gitlab.com/nvidia/nvcloud/gitlab_nke-site-deploy.git
+    targetRevision: main
+  # info:
+  #   - name: NKE App-of-Apps
+  #     value: nke-site-forge-az00
+  # ### Add this finalizer ONLY if you want child apps to cascade delete.
+  # finalizers:
+  #   - resources-finalizer.argocd.argoproj.io
+  ignoreDifferencesMetadataLabels: true
+  ignoreMissingValueFiles: true
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+
+########################################
+# Application Definitions
+#
+# app:
+#   nginx:                              # Go conforming name (camelCase) to range over 
+#     name: nginx                       # Name of the ArgoCD application (required)
+#     chartDir: nginx                   # Directory name where chart resides (required if chart not specified)
+#     chartVer: "18.2.2"                # Helm chart version-named directory, i.e. 18.2.2 for path nginx/18.2.2 (required if chart not specified)
+#     chart: nginx                      # Helm registry chart name (optional, required if repoURL is Helm registry)
+#     kustomize: true                   # Deploy Kustomize application (optional)
+#     repoURL: https://my-git-server.com/data/my-repo.git   # Git chart repo, Helm Registry or Kustomize repo (optional)
+#     targetRevision: my/branch         # Git branch (optional)
+#     path: path/to/my-chart            # Path under chart repo (optional, required if kustomize is true)
+#     fullnameOverride: nginx-poc       # Override name of app to deploy (optional)
+#     namespace: custom-namespace       # Namespace (optional)
+#     addHelmFiles: true                # Add files to Helm chart from additional source (optional)
+#     addHelmFilesDir: environments/nke-cloud-aws-dev/my-nginx-bitnami # Override directory of additional Helm files (optional if addHelmFiles)
+#     targetRevisionHelmFiles: my/rev   # Target revision for added Helm files (optional, required if addHelmFiles is true)
+#     valueFiles:                       # List of values file (optional list)
+#       - values-nke-cloud-aws-dev.yaml # Values file (optional)
+#       - values-my-env.yaml            # Values file (optional will be merged)
+#     helmValuesFile: path/values.yaml  # allows to provide non-env specifc values file override for remote charts (only applicable when chart is specified)
+#     finalizers:                       # Metadata finalizers (optional list)
+#       - resources-finalizer.argocd.argoproj.io # Example
+#     ignoreDifferencesMetadataLabels: true # Ignore differences (optional)
+#     ignoreMissingValueFiles: true     # Ignore missing values files (optional) 
+#     syncOptions:                      # syncPolicy syncOptions (optional list)
+#       - CreateNamespace=true          # Example
+#     automated:                        # syncPolicy automated (optional)
+#       prune: true                     # Example
+#       selfHeal: true                  # Example
+#       allowEmpty: false               # Example
+#     info:                             # Extra information (optional list)
+#       - name: 'Optional info'         # Example
+#         value: 'Optional value'
+#
+########################################
+
+### Applications to deploy, including overrides
+apps:
+  argocd: # Kustomize with kustomization.yaml expected at path
+    name: argocd
+    repoURL: https://gitlab.com/nvidia/nvcloud/gitlab_nke-site-deploy.git
+    path: install-argocd/overlays/prod/nke-site-forge-prod
+    kustomize: true
+  nginxBitnami: # Remote Helm Registry with files merged from additional source
+    name: nginx-bitnami
+    repoURL: https://charts.bitnami.com/bitnami
+    targetRevision: 18.2.2
+    chart: nginx
+    addHelmFiles: true # Default is files from environments/nke-cloud-aws-dev/nginx-bitnami
+    # targetRevisionHelmFiles: nke-123/my-feature-branch
+    # addHelmFilesDir: environments/nke-cloud-aws-dev/my-nginx-bitnami
+  nginxDemo: # Remote Helm Registry
+    name: nginx-demo
+    repoURL: https://charts.bitnami.com/bitnami
+    targetRevision: 18.2.2
+    chart: nginx
+  metricsServer: # Helm chart in-repo
+    name: metrics-server
+    chartDir: metrics-server
+    chartVer: "0.7.1"

@@ -1,0 +1,173 @@
+{{- range $v := .Values.apps }}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  {{- if $v.fullnameOverride }}
+  name: {{ $v.fullnameOverride }}
+  {{- else }}
+  name: {{ $v.name }}
+  fullnameOverride: {{ $v.fullnameOverride }}
+  {{- end }}
+  namespace: argocd
+  {{- if $v.finalizers }}
+  finalizers:
+  {{- range $v.finalizers }}
+  - {{ . }}
+  {{- end }}
+  {{- else if $.Values.spec.finalizers }}
+  finalizers:
+  {{- range $.Values.spec.finalizers }}
+  - {{ . }}
+  {{- end }}
+  {{- end }}
+spec:
+  project: {{ $.Values.spec.project }}
+  destination:
+    {{- if $v.namespace }}
+    namespace: {{ $v.namespace }}
+    {{- else if $v.fullnameOverride }}
+    namespace: {{ $.Values.spec.destination.namePrefix }}{{ $v.fullnameOverride }}
+    {{- else }}
+    namespace: {{ $.Values.spec.destination.namePrefix }}{{ $v.name }}
+    {{- end }}
+    server: {{ $.Values.spec.destination.server }}
+  {{- /* Helm Chart or Kustomize */}}
+  {{- if not $v.kustomize }}
+  sources: {{- /* Helm Chart */}}
+    {{- if $v.repoURL }}
+    - repoURL: {{ $v.repoURL }}
+    {{- else }}
+    - repoURL: {{ $.Values.spec.source.repoURL }}
+    {{- end }}
+    {{- if $v.chart }}
+      {{- /* do not set path */}}
+    {{- else if $v.path }}
+      path: {{ $v.path }}
+    {{- else }}
+      path: {{ $v.chartDir }}/{{ $v.chartVer }}
+    {{- end }}
+    {{- if $v.targetRevision }}
+      targetRevision: {{ $v.targetRevision }}
+    {{- else }}
+      targetRevision: {{ $.Values.spec.source.targetRevision }}
+    {{- end }}
+    {{- if $v.chart }}
+      chart: {{ $v.chart }}
+    {{- end }}
+      helm:
+        valueFiles:
+        {{- if $v.valueFiles }}
+          {{- range $v.valueFiles }}
+          - $values/environments/{{ $.Values.spec.envPath }}/{{ $.Values.spec.env }}/{{ . }}
+          {{- end }}
+        {{- else if $v.chart }}
+          - $values/environments/{{ $.Values.spec.envPath }}/{{ $.Values.spec.env }}/values-{{ $v.name }}.yaml
+          {{- if $v.helmValuesFile }}
+          - $values/{{ $v.helmValuesFile }}
+          {{- end }}
+        {{- else }}
+          - $values/environments/{{ $.Values.spec.envPath }}/{{ $.Values.spec.env }}/values-{{ $v.chartDir }}.yaml
+        {{- end }}
+        {{- if $v.ignoreMissingValueFiles }}
+        ignoreMissingValueFiles: {{ $v.ignoreMissingValueFiles }}
+        {{- else if $.Values.spec.ignoreMissingValueFiles }}
+        ignoreMissingValueFiles: {{ $.Values.spec.ignoreMissingValueFiles }}
+        {{- end }}
+    - repoURL: {{ $.Values.spec.source.repoURL }}
+      {{- if $v.valuesTargetRevision }}
+      targetRevision: {{ $v.valuesTargetRevision }}
+      {{- else }}
+      targetRevision: {{ $.Values.spec.source.targetRevision }}
+      {{- end }}
+      ref: values
+    {{- if $v.addHelmFiles }}
+    - repoURL: {{ $.Values.spec.source.repoURL }}
+      {{- if $v.valuesTargetRevision }}
+      targetRevision: {{ $v.valuesTargetRevision }}
+      {{- else }}
+      targetRevision: {{ $.Values.spec.source.targetRevision }}
+      {{- end }}
+      {{- if $v.addHelmFilesDir }}
+      path: {{ $v.addHelmFilesDir }}
+      {{- else }}
+      path: environments/{{ $.Values.spec.envPath }}/{{ $.Values.spec.env }}/{{ $v.name }}
+      {{- end }}
+    {{- end }}
+  ignoreDifferences:
+    {{- if or $v.ignoreDifferencesMetadataLabels $.Values.spec.ignoreDifferencesMetadataLabels }}
+    - group: apiextensions.k8s.io
+      jsonPointers:
+      - /metadata/labels
+      kind: CustomResourceDefinition
+    {{- end }}
+    {{- /* Add any custom ignoreDiffs for argoapp */}}
+    {{- if $v.ignoreDifferences }}
+      {{- with $v.ignoreDifferences }}{{ toYaml . | nindent 4 }}{{- end }}
+    {{- end }}
+    {{- if $.Values.spec.ignoreDifferences }}
+      {{- with $.Values.spec.ignoreDifferences }}{{ toYaml . | nindent 4 }}{{- end }}
+    {{- end }}
+    {{- /* End of custom ignoreDiffs logic */}}
+  {{- else }}   {{- /* Else $v.kustomize */}}
+  source:
+    {{- if $v.repoURL }}
+    repoURL: {{ $v.repoURL }}
+    {{- else }}
+    repoURL: {{ $.Values.spec.source.repoURL }}
+    {{- end }}
+    {{- if $v.path }}
+    path: {{ $v.path }}
+    {{- end }}
+    {{- if $v.targetRevision }}
+    targetRevision: {{ $v.targetRevision }}
+    {{- else }}
+    targetRevision: {{ $.Values.spec.source.targetRevision }}
+    {{- end }}
+  {{- end }}
+  {{- /* End if not $v.kustomize */}}
+  {{- if $v.info }}
+  info:
+  {{- range $v.info }}
+  - {{ . }}
+  {{- end }}
+  {{- else if $.Values.spec.info }}
+  info:
+    {{- range $k, $v := $.Values.spec.info }}
+    - name: {{ $v.name }}
+      value: {{ $v.value}}
+    {{- end }}
+  {{- end }}
+  syncPolicy:
+    {{- /*  Child app has key automated */}}
+    {{- if hasKey $v "automated" }}
+      {{- if and (not (hasKey $v.automated "prune")) (not (hasKey $v.automated "selfHeal")) (not (hasKey $v.automated "allowEmpty")) }}
+        {{- /*  Key exists and is empty dictionary */}}
+    automated: {}
+      {{- else }}
+        {{- /*  Key exists and is non-empty value */}}
+    automated:
+      {{- with $v.automated }}{{ toYaml . | nindent 6 }}{{- end }}
+      {{- end }}
+    {{- /*  App-of-apps has spec.syncPolicy.automated */}}
+    {{- else if hasKey $.Values.spec.syncPolicy "automated" }}
+      {{- if and (not (hasKey $.Values.spec.syncPolicy.automated "prune")) (not (hasKey $.Values.spec.syncPolicy.automated "selfHeal")) (not (hasKey $.Values.spec.syncPolicy.automated "allowEmpty"))  }}
+        {{- /*  Key exists and is empty dictionary */}}
+    automated: {}
+      {{- else }}
+        {{- /*  Key exists and is non-empty value */}}
+    automated:
+      {{- with $.Values.spec.syncPolicy.automated }}{{ toYaml . | nindent 6 }}{{- end }}
+      {{- end }}
+    {{- end }}
+    syncOptions:
+      {{- if $v.syncOptions }}
+      {{- range $v.syncOptions }}
+      - {{ . }}
+      {{- end }}
+      {{- else }}
+      {{- range $.Values.spec.syncPolicy.syncOptions }}
+      - {{ . }}
+      {{- end }}
+      {{- end }}
+---
+{{- end }}

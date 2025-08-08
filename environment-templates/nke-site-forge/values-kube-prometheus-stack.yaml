@@ -1,0 +1,161 @@
+global:
+  imagePullSecrets:
+    - ngc-registry-nke-imagepull
+  imageRegistry: nvcr.io
+grafana:
+  enabled: false
+alertmanager:
+  enabled: false
+kube-state-metrics:
+  collectors:
+    - nodes
+    - namespaces
+    - pods
+    - deployments
+    - daemonsets
+    - statefulsets
+    - jobs
+    - replicasets
+    - resourcequotas
+    - persistentvolumeclaims
+    - persistentvolumes
+    - services
+    - endpoints
+    - configmaps
+    - networkpolicies
+    - replicationcontrollers
+  customResourceState:
+    config:
+      spec:
+        resources:
+          - groupVersionKind:
+              group: argoproj.io
+              kind: Application
+              version: v1alpha1
+    enabled: true
+  enabled: true
+  image:
+    repository: j7sbcjl3qgta/nvcr_io__nv-ngc-devops__kube-state-metrics
+    tag: v2.12.0
+  metricLabelsAllowlist:
+    - nodes=[*]
+    - pods=[*]
+    - namespaces=[*]
+  rbac:
+    extraRules:
+      - apiGroups:
+          - argoproj.io
+        resources:
+          - applications
+        verbs:
+          - list
+          - watch
+      - apiGroups:
+          - nvidia.com
+        resources:
+          - ClusterPolicy
+        verbs:
+          - list
+          - watch
+kubelet:
+  serviceMonitor:
+    cAdvisor: true
+    metricRelabelings:
+      - action: keep
+        regex: |
+          container_memory_working_set_bytes|
+          container_cpu_usage_seconds_total|
+          container_network_receive_bytes_total|
+          container_network_transmit_bytes_total|
+          container_network_receive_packets_total|
+          container_network_transmit_packets_total|
+          container_fs_reads_total|
+          container_fs_writes_total|
+          container_fs_reads_bytes_total|
+          container_fs_writes_bytes_total|
+          container_memory_usage_bytes
+        sourceLabels:
+          - __name__
+nameOverride: prometheus
+namespaceOverride: monitoring
+prometheus:
+  ingress:
+    enabled: false
+  prometheusSpec:
+    externalLabels:
+      cluster: ${ENV_NAME}
+      csp: forgeazure
+      env: prod
+      platform: forge-nke
+    image:
+      repository: j7sbcjl3qgta/nvcr_io__nv-ngc-devops__prometheus
+      tag: v2.53.0
+    podMonitorSelectorNilUsesHelmValues: false
+    query:
+      timeout: 10m
+    remoteWrite:
+      - basicAuth:
+          password:
+            key: password
+            name: nvidia-grafana-net-auth
+          username:
+            key: username
+            name: nvidia-grafana-net-auth
+        name: nvidia-grafana-net
+        queueConfig:
+          capacity: 20000
+          maxSamplesPerSend: 4000
+          maxShards: 100
+          minShards: 50
+        url: https://prometheus-prod-36-prod-us-west-0.grafana.net/api/prom/push
+    resources:
+      limits:
+        cpu: 8
+        memory: 70Gi
+      requests:
+        cpu: 4
+        memory: 40Gi
+    retention: 5d
+    ruleNamespaceSelector:
+      matchLabels:
+        kubernetes.io/metadata.name: prometheus
+    ruleSelectorNilUsesHelmValues: false
+    scrapeInterval: 2m
+    secrets:
+      - nvidia-grafana-net-auth
+    serviceMonitorSelectorNilUsesHelmValues: false
+prometheus-node-exporter:
+  image:
+    repository: j7sbcjl3qgta/nvcr_io__nv-ngc-devops__node-exporter
+    tag: v1.8.1
+  prometheus:
+    monitor:
+      relabelings:
+        - action: replace
+          regex: ^(.*)$
+          replacement: $1
+          separator: ;
+          sourceLabels:
+            - __meta_kubernetes_pod_node_name
+          targetLabel: node_name
+  service:
+    listenOnAllInterfaces: false
+prometheusOperator:
+  admissionWebhooks:
+    failurePolicy: Ignore
+    patch:
+      image:
+        repository: j7sbcjl3qgta/nvcr_io__nv-ngc-devops__kube-webhook-certgen
+        tag: v20221220-controller-v1.5.1-58-g787ea74b6
+      ttlSecondsAfterFinished: 60
+  image:
+    repository: j7sbcjl3qgta/quay_io__prometheus-operator__prometheus-operator
+    tag: v0.80.1
+  prometheusConfigReloader:
+    image:
+      repository: j7sbcjl3qgta/nvcr_io__nv-ngc-devops__prometheus-config-reloader
+      tag: v0.75.0
+  thanosImage:
+    repository: j7sbcjl3qgta/nvcr_io__nv-ngc-devops__thanos
+    tag: v0.35.1
+

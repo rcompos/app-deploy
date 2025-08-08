@@ -1,0 +1,18 @@
+image:
+  repository: nvcr.io/j7sbcjl3qgta/nvcr_io__nvidian__ngc-security__kubetrust-verifier
+  pullPolicy: IfNotPresent
+  tag: "0.2.6"
+  pullSecret: ngc-registry-nke-imagepull
+
+extraArgs:
+  - -allow-admin-token-reuse
+  - -proof-attest-audience
+  - test audience
+  - -verifier-cert-duration
+  - '180'
+
+service:
+  type: NodePort
+  port: 4439
+  targetPort: 4439
+  nodePort: 30439

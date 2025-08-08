@@ -1,0 +1,50 @@
+base_path: "/secrets/groups/nkek8s"  
+
+secrets:
+  - namespace: "kubernetes-replicator" 
+    source: "ngc/registry-nke-readonly"
+    override: true
+  - namespace: "argocd" 
+    source: "ngc/registry-nke-readonly"
+    override: true
+  - namespace: "argocd"
+    source: "gitlabcom/repo-nke-site-deploy-readonly"
+    override: true
+  - namespace: "argocd"
+    source: "gitlabcom/repo-nke-cloud-deploy-readonly"
+    override: true
+  - namespace: "cloud-workflow-engine"
+    source: "ngc/forge-apikey"
+    override: true
+
+destination_sites: 
+  # non-prod sites
+  - nke-site-forge-az24
+  - nke-site-forge-az24-cni
+  - nke-site-forge-az24-nke
+  - nke-site-forge-az40-dev
+  - nke-site-forge-az60-dev
+  - nke-site-forge-az61-dev
+  - nke-site-forge-az61-dev2
+  - nke-site-forge-az61-dev3
+  # prod sites
+  - nke-site-forge-az01
+  - nke-site-forge-az02
+  - nke-site-forge-az05
+  - nke-site-forge-az06
+  - nke-site-forge-az22
+  - nke-site-forge-az23
+  - nke-site-forge-az23-2
+  - nke-site-forge-az25-prd1
+  - nke-site-forge-az25-prd2
+  - nke-site-forge-az27
+  - nke-site-forge-az28
+  - nke-site-forge-az33
+  - nke-site-forge-az40
+  - nke-site-forge-az41
+  - nke-site-forge-az50
+  - nke-site-forge-az51
+  - nke-site-forge-az52-prd1
+  - nke-site-forge-az60
+  - nke-site-forge-az61
+  - nke-site-forge-az61-prd2

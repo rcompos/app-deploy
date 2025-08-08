@@ -1,0 +1,61 @@
+# server:
+#   config:
+#     persistence:
+#       driver: sql
+#       default:
+#         driver: sql
+#         sql:
+#           driver: postgres12
+#           host: cnpg-temporal-rw.cnpg-temporal.svc.cluster.local
+#           port: 5432
+#           database: temporal
+#           user: postgres
+#           password: postgres
+#           # for a production deployment use this instead of `password` and provision the secret beforehand e.g. with a sealed secret
+#           # it has a single key called `password`
+#           # existingSecret: temporal-default-store
+#           maxConns: 20
+#           maxConnLifetime: "1h"
+#       visibility:
+#         driver: sql
+#         sql:
+#           driver: postgres12
+#           host: cnpg-temporal-rw.cnpg-temporal.svc.cluster.local
+#           port: 5432
+#           database: temporal_visibility
+#           user: postgres
+#           password: postgres
+#           # for a production deployment use this instead of `password` and provision the secret beforehand e.g. with a sealed secret
+#           # it has a single key called `password`
+#           # existingSecret: temporal-visibility-store
+#           maxConns: 20
+#           maxConnLifetime: "1h"
+
+cassandra:
+  enabled: false
+  persistence:
+    enabled: false
+
+mysql:
+  enabled: false
+
+postgresql:
+  enabled: true
+
+elasticsearch:
+  enabled: false
+
+schema:
+  createDatabase:
+    enabled: true
+  setup:
+    enabled: true
+  update:
+    enabled: true
+
+prometheus:
+  enabled: false
+  nodeExporter:
+    enabled: false
+grafana:
+  enabled: false

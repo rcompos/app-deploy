@@ -1,0 +1,7 @@
+image:
+  repository: ghcr.io/cloudnative-pg/cloudnative-pg
+  pullPolicy: IfNotPresent
+  tag: "1.24.1"
+
+# imagePullSecrets:
+#   - name: ngc-registry-nke-imagepull

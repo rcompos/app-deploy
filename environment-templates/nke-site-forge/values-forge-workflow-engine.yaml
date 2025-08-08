@@ -1,0 +1,17 @@
+image:
+  repository: nvcr.io/j7sbcjl3qgta/forge-workflow-engine
+  tag: v1.0.7
+
+imagePullSecrets:
+  - name: ngc-registry-nke-imagepull
+
+temporal:
+  cloudDb:
+    host: cnpg-site-rw.cnpg-site.svc.cluster.local
+    args: sslmode=disable
+
+podSecurityContext:
+  runAsNonRoot: false
+
+livenessProbe: null
+readinessProbe: null

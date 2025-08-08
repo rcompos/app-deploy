@@ -1,0 +1,21 @@
+nameOverride: cnpg-cloud
+# fullnameOverride: ""
+
+type: postgresql
+mode: standalone
+
+cluster:
+  instances: 3
+  superuserSecret: superuser-secret
+  storage:
+    size: 100Gi
+    storageClass: local-storage-cnpg-cloud
+  affinity:
+    topologyKey: kubernetes.io/hostname  # Used in place of 'zone' since we are single AZ
+  initdb:
+    database: cloud-workflow
+    owner: cloud
+    secret:
+      name: cnpg-cloud-bootstrap-secret
+  monitoring:
+    enabled: true

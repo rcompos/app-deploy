@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+set -x
+
+CLUSTER_NAME=$1
+REPO_NAME=$2
+REPO_URL=$3
+DEPLOY_ENV=$4
+
+CLUSTER_DIR="cluster-${CLUSTER_NAME}"
+cd "$CLUSTER_DIR"
+
+export KUBECONFIG="${PWD}/${CLUSTER_NAME}.kubeconfig"
+
+# Change to git repo dir
+cd "${REPO_NAME}"
+
+# Login to ArgoCD
+ARGOCD_PW=`argocd admin initial-password -n argocd | head -1`; echo $ARGOCD_PW
+kubectl -n argocd port-forward service/argocd-server 9443:443 > /dev/null 2>&1 &
+sleep 30
+argocd login localhost:9443 --username admin --password $ARGOCD_PW --insecure --grpc-web
+
+# Deploy ArgoCD app-of-apps
+cd scripts
+
+echo "DEPLOY_ENV=$DEPLOY_ENV"
+app_of_apps=("aoa-infra" "aoa-observability" "aoa-nke-site")
+for aoa in ${app_of_apps[@]}; do
+  echo $aoa
+  ./argocd-app-of-apps-sync.sh -g -i -y "$aoa"
+  sleep 5
+  argocd app sync -l app.kubernetes.io/instance="$aoa" --async --grpc-web --insecure
+  echo
+  sleep 5
+done
+
+echo "Stopping argocd port forward"
+kill %1

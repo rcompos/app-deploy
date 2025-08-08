@@ -1,0 +1,17 @@
+image:
+  tag: v2.10.2
+  pullPolicy: IfNotPresent
+
+imagePullSecrets:
+  - name: ngc-registry-nke-imagepull
+
+# grantClusterAdmin: false
+grantClusterAdmin: true
+
+# securityContext:
+#   capabilities:
+#     drop:
+#       - ALL
+#   readOnlyRootFilesystem: true
+#   runAsNonRoot: true
+#   runAsUser: 1000

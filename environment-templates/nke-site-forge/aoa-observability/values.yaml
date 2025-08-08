@@ -1,0 +1,58 @@
+### Global values apply to all child ArgoCD Applications
+spec:
+  name: aoa-observability
+  env: ${ENV_NAME}
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namePrefix: ""
+  source:
+    repoURL: ${REPO_URL}
+    targetRevision: ${TARGET_REVISION}
+  # ### Add this finalizer ONLY if you want child apps to cascade delete.
+  # finalizers:
+  #   - resources-finalizer.argocd.argoproj.io
+  ignoreDifferencesMetadataLabels: true
+  envPath: ${PROD_TYPE}/${CSP}
+  syncPolicy:
+    automated: {}
+    syncOptions:
+      - CreateNamespace=true
+
+### Applications to deploy, including overrides
+apps:
+  - name: kube-prometheus-stack 
+    repoURL: https://helm.ngc.nvidia.com/j7sbcjl3qgta  # NGC NKE
+    targetRevision: "68.0.0"
+    chart: kube-prometheus-stack
+    namespace: monitoring
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+    addHelmFiles: true
+    addHelmFilesDir: overrides/kube-prometheus-stack/templates
+    targetRevisionHelmFiles: main
+    ignoreDifferences:
+    - group: apiextensions.k8s.io
+      jsonPointers:
+      - /metadata/labels
+      kind: CustomResourceDefinition
+  - name: fluent-bit
+    repoURL: https://helm.ngc.nvidia.com/j7sbcjl3qgta  # NGC NKE
+    targetRevision: "0.47.9"
+    chart: fluent-bit
+  - name: zipkin
+    repoURL: https://helm.ngc.nvidia.com/j7sbcjl3qgta  # NGC NKE
+    targetRevision: "0.3.4"
+    chart: zipkin
+  - name: alloy
+    repoURL: https://helm.ngc.nvidia.com/j7sbcjl3qgta 
+    targetRevision: "0.12.2"
+    chart: alloy
+    namespace: monitoring 
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+    addHelmFiles: true
+    addHelmFilesDir: overrides/alloy/templates
+    targetRevisionHelmFiles: main

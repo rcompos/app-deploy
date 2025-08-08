@@ -1,0 +1,32 @@
+### Global values apply to all child ArgoCD Applications
+spec:
+  name: aoa-infra
+  env: local-dev-test0
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namePrefix: ""
+  source:
+    repoURL: https://github.com/rcompos/app-deploy.git
+    targetRevision: main
+  # ### Add this finalizer ONLY if you want child apps to cascade delete.
+  # finalizers:
+  #   - resources-finalizer.argocd.argoproj.io
+  ignoreDifferencesMetadataLabels: true
+  envPath: prod/forge
+  syncPolicy:
+    # automated: {}
+    syncOptions:
+      - CreateNamespace=true
+
+### Applications to deploy, including overrides
+apps:
+  - name: temporal
+    chartDir: temporal
+    ignoreDifferences:
+      - group: batch
+        kind: Job
+        name: temporal-schema-*
+        jsonPointers:
+          - /status
+          - /spec/template/spec/initContainers

@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: repo-gitlab-nke-site-deploy
+  namespace: argocd
+  labels:
+    argocd.argoproj.io/secret-type: repository
+stringData:
+  type: git
+  url: https://gitlab.com/nvidia/nvcloud/gitlab_nke-site-deploy.git
+  username: nke-read-only
+  password: ${GITLAB_NKE_SITE_DEPLOY_TOKEN}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: repo-gitlab-nke-cloud-deploy
+  namespace: argocd
+  labels:
+    argocd.argoproj.io/secret-type: repository
+stringData:
+  type: git
+  url: https://gitlab.com/nvidia/nvcloud/gitlab_nke-cloud-deploy.git
+  username: nke-read-only
+  password: ${GITLAB_NKE_CLOUD_DEPLOY_TOKEN}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: repo-helm-ngc-nke
+  namespace: argocd
+  labels:
+    argocd.argoproj.io/secret-type: repository
+stringData:
+  name: j7sbcjl3qgta
+  url: https://helm.ngc.nvidia.com/j7sbcjl3qgta
+  type: helm
+  username: $oauthtoken
+  password: ${HELM_NGC_NKE_TOKEN}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: repo-helm-ngc-nvidian
+  namespace: argocd
+  labels:
+    argocd.argoproj.io/secret-type: repository
+stringData:
+  name: nvidian
+  url: https://helm.ngc.nvidia.com/nvidian
+  type: helm
+  username: $oauthtoken
+  password: ${HELM_NGC_NVIDIAN_TOKEN}

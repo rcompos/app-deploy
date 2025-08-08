@@ -1,0 +1,123 @@
+persistentVolumes:
+  # Node 1
+  - name: n1pv1
+    capacity:
+      storage: 100Gi
+    volumeMode: Filesystem
+    accessModes:
+      - ReadWriteOnce
+    storageClassName: local-storage-cnpg-temporal
+    local:
+      path: /mnt/shared/cnpg-temporal
+    nodeAffinityMatchKey: nke.nvidia.com/storage-node
+    nodeAffinityMatchValues:
+      - "1"
+
+  - name: n1pv2
+    capacity:
+      storage: 100Gi
+    volumeMode: Filesystem
+    accessModes:
+      - ReadWriteOnce
+    storageClassName: local-storage-cnpg-site
+    local:
+      path: /mnt/shared/cnpg-site
+    nodeAffinityMatchKey: nke.nvidia.com/storage-node
+    nodeAffinityMatchValues:
+      - "1"
+  
+  # temporary - cloud volume
+  - name: n1pv3
+    capacity:
+      storage: 100Gi
+    volumeMode: Filesystem
+    accessModes:
+      - ReadWriteOnce
+    storageClassName: local-storage-cnpg-cloud
+    local:
+      path: /mnt/shared/cnpg-cloud
+    nodeAffinityMatchKey: nke.nvidia.com/storage-node
+    nodeAffinityMatchValues:
+      - "1"
+
+  # Node 2
+  - name: n2pv1
+    capacity:
+      storage: 100Gi
+    volumeMode: Filesystem
+    accessModes:
+      - ReadWriteOnce
+    storageClassName: local-storage-cnpg-temporal
+    local:
+      path: /mnt/shared/cnpg-temporal
+    nodeAffinityMatchKey: nke.nvidia.com/storage-node
+    nodeAffinityMatchValues:
+      - "2"
+
+  - name: n2pv2
+    capacity:
+      storage: 100Gi
+    volumeMode: Filesystem
+    accessModes:
+      - ReadWriteOnce
+    storageClassName: local-storage-cnpg-site
+    local:
+      path: /mnt/shared/cnpg-site
+    nodeAffinityMatchKey: nke.nvidia.com/storage-node
+    nodeAffinityMatchValues:
+      - "2"
+  
+  # temporary - cloud volume
+  - name: n2pv3
+    capacity:
+      storage: 100Gi
+    volumeMode: Filesystem
+    accessModes:
+      - ReadWriteOnce
+    storageClassName: local-storage-cnpg-cloud
+    local:
+      path: /mnt/shared/cnpg-cloud
+    nodeAffinityMatchKey: nke.nvidia.com/storage-node
+    nodeAffinityMatchValues:
+      - "2"
+
+  # Node 3
+  - name: n3pv1
+    capacity:
+      storage: 100Gi
+    volumeMode: Filesystem
+    accessModes:
+      - ReadWriteOnce
+    storageClassName: local-storage-cnpg-temporal
+    local:
+      path: /mnt/shared/cnpg-temporal
+    nodeAffinityMatchKey: nke.nvidia.com/storage-node
+    nodeAffinityMatchValues:
+      - "3"
+
+  - name: n3pv2
+    capacity:
+      storage: 100Gi
+    volumeMode: Filesystem
+    accessModes:
+      - ReadWriteOnce
+    storageClassName: local-storage-cnpg-site
+    local:
+      path: /mnt/shared/cnpg-site
+    nodeAffinityMatchKey: nke.nvidia.com/storage-node
+    nodeAffinityMatchValues:
+      - "3"
+      
+  # temporary - cloud volume
+  - name: n3pv3
+    capacity:
+      storage: 100Gi
+    volumeMode: Filesystem
+    accessModes:
+      - ReadWriteOnce
+    storageClassName: local-storage-cnpg-cloud
+    local:
+      path: /mnt/shared/cnpg-cloud
+    nodeAffinityMatchKey: nke.nvidia.com/storage-node
+    nodeAffinityMatchValues:
+      - "3"
