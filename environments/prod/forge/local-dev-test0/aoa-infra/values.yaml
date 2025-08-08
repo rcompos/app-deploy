@@ -55,5 +55,5 @@ apps:
         kind: Deployment
         name: temporal-grafana
         jsonPointers:
-          - /spec/template/metadata/annotations/checksum/secret
+          - /spec/template/metadata/annotations
 
