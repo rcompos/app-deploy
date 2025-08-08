@@ -41,3 +41,8 @@ apps:
           - /spec/completions
           - /spec/parallelism
           - /spec/activeDeadlineSeconds
+      - group: ""
+        kind: pod
+        name: temporal-schema-*
+        jsonPointers:
+          - /status
